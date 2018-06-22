@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-travis_retry wget https://dl.bintray.com/boostorg/release/${BOOST_VER}/source/boost_${BOOST_VER//./_}.tar.gz && tar zxf boost_${BOOST_VER//./_}.tar.gz
+wget --tries=15 --no-check-certificate --quiet -O - https://dl.bintray.com/boostorg/release/${BOOST_VER}/source/boost_${BOOST_VER//./_}.tar.gz | tar -xz
 cd boost_${BOOST_VER//./_} && ./bootstrap.sh
 if [[ "${CXX%%+*}" == "clang" ]]; then
   echo "using clang : : ${CXX} ;" >> project-config.jam

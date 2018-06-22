@@ -108,34 +108,37 @@ env:
     #- CODECOV_TOKEN=:uuid-repo-token
 
 install:
-  - >
+  - |
     if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
     ${CXX} --version
     cd ${TRAVIS_BUILD_DIR}
-    ############################################################################
-    # Install libc++ and libc++abi if needed
-    ############################################################################
+  ############################################################################
+  # Install libc++ and libc++abi if needed
+  ############################################################################
+  - |
     if [[ "${CXX%%+*}" == "clang" ]]; then
       bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/lib++.install)
       export B2FLAGS="cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 linkflags=-L${TRAVIS_BUILD_DIR}/llvm/out/lib"
       export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRAVIS_BUILD_DIR}/llvm/out/lib"
     fi
-    ############################################################################
-    # Download boost and build boost tests
-    ############################################################################
+  ############################################################################
+  # Download boost and build boost tests
+  ############################################################################
+  - |
     cd ${TRAVIS_BUILD_DIR}
     bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi --layout=versioned --with-test -d0 stage debug
     export BOOST_ROOT=${TRAVIS_BUILD_DIR}/boost_${BOOST_VER//./_}
     cd ${TRAVIS_BUILD_DIR}
   - rm project-config.jam
-  - bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/project-config.jam)
+  - curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/project-config.jam > project-config.jam
   - cd ${TRAVIS_BUILD_DIR}
   - >
     if [[ "${COVERAGE}" == "ON" ]]; then
-      export B2FLAGS="${B2FLAGS}cxxflags=\"--coverage\" linkflags=\"--coverage\""
+      export B2FLAGS="${B2FLAGS} cxxflags=\"--coverage\" linkflags=\"--coverage\""
     fi
 
 script:
-  - |
-    cat project-config.jam
-    echo '${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug'
+  - cat project-config.jam
+  - echo '${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug'
+  - ls ${BOOST_ROOT}
+  - ls ${BOOST_ROOT}/stage/lib
