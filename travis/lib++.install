@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+if   [[ "${CXX}" == "clang++-3.5" ]]; then LLVM_VERSION="3.5.2";
+elif [[ "${CXX}" == "clang++-3.6" ]]; then LLVM_VERSION="3.6.2";
+elif [[ "${CXX}" == "clang++-3.7" ]]; then LLVM_VERSION="3.7.1";
+elif [[ "${CXX}" == "clang++-3.8" ]]; then LLVM_VERSION="3.8.1";
+elif [[ "${CXX}" == "clang++-3.9" ]]; then LLVM_VERSION="3.9.1";
+elif [[ "${CXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.1";
+elif [[ "${CXX}" == "clang++-5.0" ]]; then LLVM_VERSION="5.0.2";
+elif [[ "${CXX}" == "clang++-6.0" ]]; then LLVM_VERSION="6.0.0";
+fi
+if [[ "${TRAVIS_OS_NAME}" == "ocx" ]]; then
+   brew install cmake || brew upgrade cmake
+else
+    CMAKE_URL="https://cmake.org/files/v3.11/cmake-3.11.4-Linux-x86_64.tar.gz"
+    mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+    export PATH=$(pwd)/cmake/bin:${PATH}
+fi
+LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
+LIBCXX_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
+LIBCXXABI_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxxabi-${LLVM_VERSION}.src.tar.xz"
+mkdir -p llvm llvm/build llvm/projects/libcxx llvm/projects/libcxxabi
+travis_retry wget -O - ${LLVM_URL} | tar --strip-components=1 -xJ -C llvm || exit 1
+travis_retry wget -O - ${LIBCXX_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxx || exit 1
+travis_retry wget -O - ${LIBCXXABI_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxxabi || exit 1
+(cd llvm/build && cmake .. -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/llvm/out) || exit 1
+(cd llvm/build/projects/libcxx && make install -j2) || exit 1
+(cd llvm/build/projects/libcxxabi && make install -j2) || exit 1
