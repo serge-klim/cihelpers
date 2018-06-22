@@ -34,11 +34,3 @@ project
 
 variant asan : debug : ;
 variant clang-prof : debug :  ;
-using clang : : clang++ ;
-using clang : : clang++ ;
-using clang : : clang++ ;
-using clang : : clang++ ;
-using clang : : clang++ ;
-using clang : : clang++ ;
-using clang : : clang++ ;
-using clang : : clang++ ;
