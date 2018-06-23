@@ -16,12 +16,27 @@ using clang : : $(CXX) :
 						  ;
 }
 
+if [ os.name ] in NT
+{
+
+using msvc : : :
+	  <cxxflags>/permissive-
+	  <cxxflags>/analyze
+	  <cxxflags>/std:c++latest
+     ;
+
+}
+
 import boost ;
 using boost : $(BOOST_VER) : <include>$(BOOST_ROOT) <library>$(BOOST_LIBS) ;
 
 
 project
     : requirements
+		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_SANITIZE_VECTOR
+		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_ASSERTIONS
+		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_DEBUG 
+		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_DEBUG_PEDANTIC
            <variant>asan:<cxxflags>-O1
            <variant>asan:<cxxflags>-fno-limit-debug-info
            <variant>asan:<cxxflags>-fno-omit-frame-pointer
