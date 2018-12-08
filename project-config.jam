@@ -22,8 +22,21 @@ if [ os.name ] in NT
 using msvc : : :
 	  <cxxflags>/permissive-
 	  <cxxflags>/analyze
-	  <cxxflags>/std:c++latest
+#	  <cxxflags>/std:c++latest
      ;
+
+lib odbc32 : : ;
+lib odbccp32 : : ;
+
+alias odbc
+	: odbc32 odbccp32
+;
+
+}
+else
+{
+
+lib odbc : : ;
 
 }
 
