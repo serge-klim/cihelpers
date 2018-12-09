@@ -1,3 +1,4 @@
+project user-config ;
 import os ;
 local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
 local BOOST_VER = [ os.environ BOOST_VER ] ;
