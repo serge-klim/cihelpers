@@ -58,8 +58,10 @@ project
            <variant>asan:<linkflags>-fsanitize=leak
            <variant>asan:<linkflags>-fsanitize=address
 		   <testing.arg>"--log_level=all"
+		   <variant>opencppcoverage:<testing.launcher>trunner.cmd
         ;
 #project : requirements <testing.arg>"--output_format=XML --log_sink=tests.xml" ;
 
+variant opencppcoverage : profile : ;
 variant asan : debug : ;
 variant clang-prof : debug :  ;
