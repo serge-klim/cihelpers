@@ -47,19 +47,19 @@ using boost : $(BOOST_VER) : <include>$(BOOST_ROOT) <library>$(BOOST_LIBS) ;
 
 project
     : requirements
-		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_SANITIZE_VECTOR
-		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_ASSERTIONS
-		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_DEBUG 
-		   <variant>debug:<toolset>gcc:<define>_GLIBCXX_DEBUG_PEDANTIC
-           <variant>asan:<cxxflags>-O1
-           <variant>asan:<cxxflags>-fno-limit-debug-info
-           <variant>asan:<cxxflags>-fno-omit-frame-pointer
-           <variant>asan:<cxxflags>-fsanitize=address
-           <variant>asan:<linkflags>-fsanitize=leak
-           <variant>asan:<linkflags>-fsanitize=address
-		   <testing.arg>"--log_level=all"
-		   <variant>opencppcoverage:<testing.launcher>trunner.cmd
-        ;
+	   <variant>debug:<toolset>gcc:<define>_GLIBCXX_SANITIZE_VECTOR
+	   <variant>debug:<toolset>gcc:<define>_GLIBCXX_ASSERTIONS
+	   <variant>debug:<toolset>gcc:<define>_GLIBCXX_DEBUG 
+	   <variant>debug:<toolset>gcc:<define>_GLIBCXX_DEBUG_PEDANTIC
+	   <variant>asan:<cxxflags>-O1
+	   <variant>asan:<cxxflags>-fno-limit-debug-info
+	   <variant>asan:<cxxflags>-fno-omit-frame-pointer
+	   <variant>asan:<cxxflags>-fsanitize=address
+	   <variant>asan:<linkflags>-fsanitize=leak
+	   <variant>asan:<linkflags>-fsanitize=address
+	   <variant>opencppcoverage:<testing.launcher>trunner.cmd
+    ;
+
 #project : requirements <testing.arg>"--output_format=XML --log_sink=tests.xml" ;
 
 variant opencppcoverage : profile : ;
