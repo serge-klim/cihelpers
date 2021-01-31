@@ -103,6 +103,21 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-6.0
+    - os: linux
+      dist: bionic
+      env: >
+           COMPILER=clang++-10 TOOLSET=clang CPPSTD=c++20
+           BOOST_VER=1.75.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-10
+            - llvm-10
+            - libc++-10-dev
+            - libc++abi-10-dev
 env:
   global:
     #- CODECOV_TOKEN=:uuid-repo-token
