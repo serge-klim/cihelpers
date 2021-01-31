@@ -8,6 +8,7 @@ elif [[ "${CXX}" == "clang++-3.9" ]]; then LLVM_VERSION="3.9.1";
 elif [[ "${CXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.1";
 elif [[ "${CXX}" == "clang++-5.0" ]]; then LLVM_VERSION="5.0.2";
 elif [[ "${CXX}" == "clang++-6.0" ]]; then LLVM_VERSION="6.0.0";
+elif [[ "${CXX}" == "clang++-10.0" ]]; then LLVM_VERSION="10.0.0";
 fi
 if [[ "${TRAVIS_OS_NAME}" == "ocx" ]]; then
    brew install cmake || brew upgrade cmake
