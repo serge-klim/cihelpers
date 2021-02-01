@@ -146,6 +146,7 @@ install:
   - |
     if [[ "${CXX%%+*}" == "clang" ]]; then
       bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/lib++.install)
+      [ $? -ne 0 ] && exit 1
       export B2FLAGS="cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 linkflags=-L${TRAVIS_BUILD_DIR}/llvm/out/lib"
       export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRAVIS_BUILD_DIR}/llvm/out/lib"
     fi
