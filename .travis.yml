@@ -129,7 +129,7 @@ install:
     bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi --layout=versioned --with-test -d0 stage debug
     export BOOST_ROOT=${TRAVIS_BUILD_DIR}/boost_${BOOST_VER//./_}
     cd ${TRAVIS_BUILD_DIR}
-  - rm project-config.jam
+  - cat ${BOOST_ROOT}/project-config.jam
   - curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/project-config.jam > project-config.jam
   - cd ${TRAVIS_BUILD_DIR}
   - >
@@ -139,6 +139,8 @@ install:
 
 script:
   - cat project-config.jam
-  - echo '${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug'
   - ls ${BOOST_ROOT}
   - ls ${BOOST_ROOT}/stage/lib
+  - cd ${TRAVIS_BUILD_DIR}/test
+  - ${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_BUILD_PATH=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER%.*} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug
+

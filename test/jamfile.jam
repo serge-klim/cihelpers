@@ -1,0 +1,8 @@
+using testing ;
+
+unit-test test :
+          test.cpp
+          :
+			<library>/boost//unit_test_framework/<link>static
+          ;
+
