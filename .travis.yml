@@ -149,7 +149,7 @@ install:
       [ $? -ne 0 ] && exit 1
       export B2FLAGS="cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 linkflags=-L${TRAVIS_BUILD_DIR}/llvm/out/lib"
       #export B2FLAGS="cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 cxxflags=-stdlib=libc++ linkflags=\"-L${TRAVIS_BUILD_DIR}/llvm/out/lib -nodefaultlibs -lc++ -lm -lc -lgcc -lgcc_s -lpthread\""
-      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRAVIS_BUILD_DIR}/llvm/out/lib"
+      export LD_LIBRARY_PATH="${TRAVIS_BUILD_DIR}/llvm/out/lib:${LD_LIBRARY_PATH}"
     fi
   ############################################################################
   # Download boost and build boost tests
