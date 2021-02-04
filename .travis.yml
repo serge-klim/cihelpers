@@ -65,6 +65,19 @@ matrix:
             - g++-7
             - libstdc++-7-dev
     - os: linux
+      dist: bionic
+      env: >
+           COMPILER=g++-10 TOOLSET=gcc-10 CPPSTD=c++20
+           BOOST_VER=1.75.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-10
+            - libstdc++-10-dev
+    - os: linux
       dist: precise
       env: >
            COMPILER=clang++-3.6 TOOLSET=clang CPPSTD=c++1y
@@ -103,6 +116,21 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-6.0
+    - os: linux
+      dist: focal
+      env: >
+           COMPILER=clang++-12 TOOLSET=clang-12 CPPSTD=c++2a
+           BOOST_VER=1.75.0
+      addons:
+        apt:
+          update: true
+          sources:
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+          packages:
+            - clang-12
+            - libc++-12-dev
+            - libc++abi-12-dev
 env:
   global:
     #- CODECOV_TOKEN=:uuid-repo-token
