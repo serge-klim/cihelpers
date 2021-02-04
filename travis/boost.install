@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 wget --tries=15 --no-check-certificate --quiet -O - https://dl.bintray.com/boostorg/release/${BOOST_VER}/source/boost_${BOOST_VER//./_}.tar.gz | tar -xz
+cd boost_${BOOST_VER//./_}
 if [[ "${CXX%%+*}" == "clang" ]]; then
-    cd boost_${BOOST_VER//./_} && ./bootstrap.sh toolset=clang
-    echo "using clang : : ${CXX} ;" >> project-config.jam
+     ./bootstrap.sh toolset=clang
 else
-    cd boost_${BOOST_VER//./_} && ./bootstrap.sh
+    ./bootstrap.sh
 fi
 ./b2 $@

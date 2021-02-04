@@ -80,7 +80,7 @@ matrix:
     - os: linux
       dist: precise
       env: >
-           COMPILER=clang++-3.6 TOOLSET=clang CPPSTD=c++1y
+           COMPILER=clang++-3.6 TOOLSET=clang-3.6 CPPSTD=c++1y
            BOOST_VER=1.66.0
       addons:
         apt:
@@ -93,7 +93,7 @@ matrix:
     - os: linux
       dist: trusty
       env: >
-           COMPILER=clang++-4.0 TOOLSET=clang CPPSTD=c++1y
+           COMPILER=clang++-4.0 TOOLSET=clang-4.0 CPPSTD=c++1y
            BOOST_VER=1.66.0
       addons:
         apt:
@@ -106,7 +106,7 @@ matrix:
     - os: linux
       dist: trusty
       env: >
-           COMPILER=clang++-6.0 TOOLSET=clang CPPSTD=c++1y
+           COMPILER=clang++-6.0 TOOLSET=clang-6.0 CPPSTD=c++1y
            BOOST_VER=1.67.0
       addons:
         apt:
@@ -117,20 +117,20 @@ matrix:
           packages:
             - clang-6.0
     - os: linux
-      dist: bionic
+      dist: focal
       env: >
-           COMPILER=clang++-10 TOOLSET=clang CPPSTD=c++20
+           COMPILER=clang++-12 TOOLSET=clang-12 CPPSTD=c++2a
            BOOST_VER=1.75.0
       addons:
         apt:
           update: true
           sources:
-            - ubuntu-toolchain-r-test
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
-            - clang-10
-            - llvm-10
-            # - libc++-10-dev
-            # - libc++abi-10-dev
+            - clang-12
+            - libc++-12-dev
+            - libc++abi-12-dev
 env:
   global:
     #- CODECOV_TOKEN=:uuid-repo-token
@@ -148,6 +148,7 @@ install:
       bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/lib++.install)
       [ $? -ne 0 ] && exit 1
       export B2FLAGS="cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 linkflags=-L${TRAVIS_BUILD_DIR}/llvm/out/lib"
+      #export B2FLAGS="cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 cxxflags=-stdlib=libc++ linkflags=\"-L${TRAVIS_BUILD_DIR}/llvm/out/lib -nodefaultlibs -lc++ -lm -lc -lgcc -lgcc_s -lpthread\""
       export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRAVIS_BUILD_DIR}/llvm/out/lib"
     fi
   ############################################################################
@@ -158,16 +159,14 @@ install:
     bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi --layout=versioned --with-test -d0 stage debug
     export BOOST_ROOT=${TRAVIS_BUILD_DIR}/boost_${BOOST_VER//./_}
     cd ${TRAVIS_BUILD_DIR}
-  - rm project-config.jam
+  - cat ${BOOST_ROOT}/project-config.jam
   - curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/project-config.jam > project-config.jam
   - cd ${TRAVIS_BUILD_DIR}
   - >
     if [[ "${COVERAGE}" == "ON" ]]; then
       export B2FLAGS="${B2FLAGS} cxxflags=\"--coverage\" linkflags=\"--coverage\""
     fi
-
+  #- cd ${TRAVIS_BUILD_DIR} && curl --retry 5 -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/project-config.jam > project-config.jam
 script:
-  - cat project-config.jam
-  - echo '${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug'
-  - ls ${BOOST_ROOT}
-  - ls ${BOOST_ROOT}/stage/lib
+  - cd ${TRAVIS_BUILD_DIR}/test
+  - ${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_BUILD_PATH=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER%.*} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug
