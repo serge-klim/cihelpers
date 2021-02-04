@@ -8,7 +8,7 @@ local CXX = [ os.environ CXX ] ;
 if [ MATCH ^(clang) : $(CXX) ]
 {
 
-using clang : : $(CXX) :
+using clang-linux : : $(CXX) :
 				 <cxxflags>-stdlib=libc++
 				 <linkflags>-lc++
 				 <linkflags>-lc++abi
