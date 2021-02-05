@@ -5,17 +5,16 @@ local BOOST_VER = [ os.environ BOOST_VER ] ;
 local BOOST_LIBS = [ os.environ BOOST_LIBS ] ;
 local CXX = [ os.environ CXX ] ;
 
-if [ MATCH ^(clang) : $(CXX) ]
-{
-
-using clang-linux : : $(CXX) :
-				 <cxxflags>-stdlib=libc++
-				 <linkflags>-lc++
-				 <linkflags>-lc++abi
-				 <linkflags>-lm
-				 <linkflags>-lc
-						  ;
-}
+# if [ MATCH ^(clang) : $(CXX) ]
+# {
+# using clang-linux : : $(CXX) :
+# 				 <cxxflags>-stdlib=libc++
+# 				 <linkflags>-lc++
+# 				 <linkflags>-lc++abi
+# 				 <linkflags>-lm
+# 				 <linkflags>-lc
+# 						  ;
+# }
 
 if [ os.name ] in NT
 {
