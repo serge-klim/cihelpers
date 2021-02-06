@@ -5,15 +5,21 @@ local BOOST_VER = [ os.environ BOOST_VER ] ;
 local BOOST_LIBS = [ os.environ BOOST_LIBS ] ;
 local CXX = [ os.environ CXX ] ;
 
+
 if [ MATCH ^(clang) : $(CXX) ]
 {
 
-using clang-linux : : $(CXX) :
-				 <cxxflags>-stdlib=libc++
+using clang : : $(CXX) :
+				 <stdlib>libc++
+				 # <cxxflags>-stdlib=libc++
+				 # <linkflags>-stdlib=libc++
+                 # <linkflags>-nodefaultlibs
 				 <linkflags>-lc++
 				 <linkflags>-lc++abi
 				 <linkflags>-lm
 				 <linkflags>-lc
+                 <linkflags>-lgcc
+                 <linkflags>-lgcc_s
 						  ;
 }
 

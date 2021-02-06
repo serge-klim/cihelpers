@@ -69,6 +69,7 @@ matrix:
       env: >
            COMPILER=g++-10 TOOLSET=gcc-10 CPPSTD=latest
            BOOST_VER=1.75.0
+           COVERAGE=ON
       addons:
         apt:
           update: true
@@ -95,7 +96,7 @@ matrix:
       env: >
            COMPILER=clang++-4.0 TOOLSET=clang CPPSTD=1y
            BOOST_VER=1.66.0
-           B2FLAGS="cxxflags=-v linkflags=-v"
+           # B2FLAGS="cxxflags=-v linkflags=-v --debug-configuration"
       addons:
         apt:
           update: true
@@ -109,7 +110,7 @@ matrix:
       env: >
            COMPILER=clang++-6.0 TOOLSET=clang CPPSTD=1y
            BOOST_VER=1.67.0
-           B2FLAGS="cxxflags=-v linkflags=-v"
+           COVERAGE=ON
       addons:
         apt:
           update: true
@@ -121,9 +122,10 @@ matrix:
     - os: linux
       dist: focal
       env: >
-           COMPILER=clang++-12 TOOLSET=clang-12 CPPSTD=2a
+           COMPILER=clang++-12 TOOLSET=clang CPPSTD=2a
            BOOST_VER=1.75.0
-           B2FLAGS="stdlib=libc++ cxxflags=-v linkflags=-v"
+           COVERAGE=ON
+           #B2FLAGS="stdlib=libc++ cxxflags=-v linkflags=-v"
       addons:
         apt:
           update: true
@@ -158,22 +160,17 @@ install:
   ############################################################################
   - |
     cd ${TRAVIS_BUILD_DIR}
-    bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi --layout=versioned --with-test stage debug
+    bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi --user-config=${TRAVIS_BUILD_DIR}/user-cfg.jam --layout=versioned --with-test stage debug
     export BOOST_ROOT=${TRAVIS_BUILD_DIR}/boost_${BOOST_VER//./_}
     cd ${TRAVIS_BUILD_DIR}
-  - cat ${BOOST_ROOT}/project-config.jam
-  - curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/project-config.jam > project-config.jam
-  - cd ${TRAVIS_BUILD_DIR}
   - >
     if [[ "${COVERAGE}" == "ON" ]]; then
       export B2FLAGS="${B2FLAGS} cxxflags=\"--coverage\" linkflags=\"--coverage\""
     fi
-  #- cd ${TRAVIS_BUILD_DIR} && curl --retry 5 -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/project-config.jam > project-config.jam
+  #- cd ${TRAVIS_BUILD_DIR} && curl --retry 5 -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/user-cfg.jam > user-cfg.jam
 script:
-  - cat project-config.jam
   - ls ${BOOST_ROOT}
   - ls ${BOOST_ROOT}/stage/lib
-  - ${CXX} -v
   - cd ${TRAVIS_BUILD_DIR}/test
-  - ${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_BUILD_PATH=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER%.*} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug
+  - ${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi --user-config=${TRAVIS_BUILD_DIR}/user-cfg.jam -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_BUILD_PATH=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER%.*} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug
 
