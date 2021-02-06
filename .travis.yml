@@ -7,67 +7,10 @@ branches:
 
 matrix:
   include:
-    # - os: osx
-    #   osx_image: xcode9.4
-    #   env: >
-    #        COMPILER=clang++-5.0 TOOLSET=clang CPPSTD=c++1y
-    #        BOOST_VER=1.66.0
-    - os: linux
-      dist: trusty
-      env: >
-           COMPILER=g++-4.8 TOOLSET=gcc-4.8 CPPSTD=c++11
-           BOOST_VER=1.67.0
-      addons:
-        apt:
-          update: true
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.8
-            - libstdc++-4.8-dev
-    - os: linux
-      dist: precise
-      env: >
-           COMPILER=g++-4.9 TOOLSET=gcc-4.9 CPPSTD=c++11
-           BOOST_VER=1.67.0
-      addons:
-        apt:
-          update: true
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-            - libstdc++-4.9-dev
-    - os: linux
-      dist: precise
-      env: >
-           COMPILER=g++-6 TOOLSET=gcc-6 CPPSTD=c++11
-           BOOST_VER=1.67.0
-      addons:
-        apt:
-          update: true
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-            - libstdc++-6-dev
-    - os: linux
-      dist: trusty
-      env: >
-           COMPILER=g++-7 TOOLSET=gcc-7 CPPSTD=c++11
-           BOOST_VER=1.67.0
-      addons:
-        apt:
-          update: true
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-            - libstdc++-7-dev
     - os: linux
       dist: bionic
       env: >
-           COMPILER=g++-10 TOOLSET=gcc-10 CPPSTD=c++20
+           COMPILER=g++-10 TOOLSET=gcc-10 CPPSTD=latest
            BOOST_VER=1.75.0
       addons:
         apt:
@@ -80,9 +23,9 @@ matrix:
     - os: linux
       dist: precise
       env: >
-           COMPILER=clang++-3.6 TOOLSET=clang-3.6 CPPSTD=c++1y
+           COMPILER=clang++-3.6 TOOLSET=clang-3.6 CPPSTD=1y
            BOOST_VER=1.66.0
-           B2FLAGS="cxxflags=-stdlib=libc++ cxxflags=-v linkflags=-v"
+           B2FLAGS="cxxflags=-v linkflags=-v"
       addons:
         apt:
           update: true
@@ -94,9 +37,9 @@ matrix:
     - os: linux
       dist: trusty
       env: >
-           COMPILER=clang++-4.0 TOOLSET=clang-4.0 CPPSTD=c++1y
+           COMPILER=clang++-4.0 TOOLSET=clang-4.0 CPPSTD=1y
            BOOST_VER=1.66.0
-           B2FLAGS="cxxflags=-stdlib=libc++ cxxflags=-v linkflags=-v"
+           B2FLAGS="cxxflags=-v linkflags=-v"
       addons:
         apt:
           update: true
@@ -108,7 +51,7 @@ matrix:
     - os: linux
       dist: trusty
       env: >
-           COMPILER=clang++-6.0 TOOLSET=clang-6.0 CPPSTD=c++1y
+           COMPILER=clang++-6.0 TOOLSET=clang-6.0 CPPSTD=1y
            BOOST_VER=1.67.0
            B2FLAGS="cxxflags=-stdlib=libc++ cxxflags=-v linkflags=-v"
       addons:
@@ -122,9 +65,9 @@ matrix:
     - os: linux
       dist: focal
       env: >
-           COMPILER=clang++-12 TOOLSET=clang-12 CPPSTD=c++2a
+           COMPILER=clang++-12 TOOLSET=clang-12 CPPSTD=2a
            BOOST_VER=1.75.0
-           B2FLAGS="cxxflags=-stdlib=libc++ cxxflags=-v linkflags=-v"
+           B2FLAGS="cxxflags=-v linkflags=-v"
       addons:
         apt:
           update: true
@@ -152,14 +95,14 @@ install:
       bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/lib++.install)
       [ $? -ne 0 ] && exit 1
       export B2FLAGS="${B2FLAGS} cxxflags=-isystem${TRAVIS_BUILD_DIR}/llvm/out/include/c++/v1 linkflags=-L${TRAVIS_BUILD_DIR}/llvm/out/lib"
-      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRAVIS_BUILD_DIR}/llvm/out/lib"
+      export LD_LIBRARY_PATH="${TRAVIS_BUILD_DIR}/llvm/out/lib:${LD_LIBRARY_PATH}"
     fi
   ############################################################################
   # Download boost and build boost tests
   ############################################################################
   - |
     cd ${TRAVIS_BUILD_DIR}
-    bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi --layout=versioned --with-test stage debug
+    bash <( curl -s https://raw.githubusercontent.com/serge-klim/cihelpers/master/travis/boost.install) toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi --layout=versioned --with-test stage debug
     export BOOST_ROOT=${TRAVIS_BUILD_DIR}/boost_${BOOST_VER//./_}
     cd ${TRAVIS_BUILD_DIR}
   - cat ${BOOST_ROOT}/project-config.jam
@@ -175,5 +118,5 @@ script:
   - ls ${BOOST_ROOT}
   - ls ${BOOST_ROOT}/stage/lib
   - cd ${TRAVIS_BUILD_DIR}/test
-  - ${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxflags="-std=${CPPSTD}" ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_BUILD_PATH=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER%.*} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug
+  - ${BOOST_ROOT}/b2 toolset=${TOOLSET} cxxstd=${CPPSTD} ${B2FLAGS} address-model=64 threading=multi -a --layout=versioned -sBOOST_ROOT=${BOOST_ROOT} -sBOOST_BUILD_PATH=${BOOST_ROOT} -sBOOST_VER=x64-${BOOST_VER%.*} -sBOOST_LIBS=${BOOST_ROOT}/stage/lib debug
 
